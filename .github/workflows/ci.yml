@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [ main, develop, 'docs/**' ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main, develop, 'docs/**' ]
 
@@ -120,18 +121,15 @@ jobs:
   release:
     needs: [classify, test]
     runs-on: ubuntu-latest
-    if: needs.classify.outputs.docs_only != 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: startsWith(github.ref, 'refs/tags/v')
 
     permissions:
-      contents: write
-      id-token: write  # Required for OIDC trusted publishing
+      contents: read
+      id-token: write
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -140,19 +138,8 @@ jobs:
         cache: 'npm'
         registry-url: 'https://registry.npmjs.org'
 
-    - name: Remove deprecated npm always-auth config
-      run: |
-        npm config delete always-auth --location=user || true
-        if [ -f "$HOME/.npmrc" ]; then
-          sed -i '/^always-auth=/d' "$HOME/.npmrc"
-        fi
-
-    # Pin npm to a compatible major for the selected Node runtime.
     - name: Update npm for trusted publishing
       run: npm install -g npm@^11.5.1
-
-    - name: Verify npm version
-      run: npm --version
 
     - name: Install dependencies
       run: npm ci
@@ -160,88 +147,12 @@ jobs:
     - name: Build library
       run: npm run build
 
-    - name: Configure Git
+    - name: Verify release tag matches package version
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        TAG_VERSION="${GITHUB_REF_NAME#v}"
+        PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+        test "$TAG_VERSION" = "$PACKAGE_VERSION"
 
-    - name: Determine version bump
-      id: version
+    - name: Publish package to npm
       run: |
-        # Get commit messages since last tag
-        LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-        COMMITS=$(git log --format=%B ${LAST_TAG}..HEAD 2>/dev/null || echo "")
-
-        # Determine bump type based on commit messages
-        if echo "$COMMITS" | grep -Eiq 'BREAKING CHANGE|^[a-z]+(\([^)]+\))?!:'; then
-          echo "bump=major" >> $GITHUB_OUTPUT
-          echo "reason=BREAKING CHANGE detected" >> $GITHUB_OUTPUT
-        elif echo "$COMMITS" | grep -Eiq '^feat(\([^)]+\))?:'; then
-          echo "bump=minor" >> $GITHUB_OUTPUT
-          echo "reason=New features detected" >> $GITHUB_OUTPUT
-        elif echo "$COMMITS" | grep -Eiq '^fix(\([^)]+\))?:'; then
-          echo "bump=patch" >> $GITHUB_OUTPUT
-          echo "reason=Bug fixes detected" >> $GITHUB_OUTPUT
-        else
-          echo "bump=patch" >> $GITHUB_OUTPUT
-          echo "reason=No conventional commits, defaulting to patch" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Version bump and publish
-      env:
-        PACKAGE_NAME: '@gspa/ui'
-      run: |
-        npm config delete always-auth --location=user || true
-        echo "Version bump reason: ${{ steps.version.outputs.reason }}"
-        echo "Bump type: ${{ steps.version.outputs.bump }}"
-
-        CURRENT_VERSION=$(node -p "require('./package.json').version")
-        PUBLISHED_VERSION=$(npm view "$PACKAGE_NAME" version 2>/dev/null || true)
-
-        echo "Current package.json version: $CURRENT_VERSION"
-        echo "Latest published npm version: ${PUBLISHED_VERSION:-<none>}"
-
-        NEXT_VERSION=$(node -e '
-          const current = process.argv[1];
-          const published = process.argv[2];
-          const bump = process.argv[3];
-
-          const parse = (value) => value.split(".").map((part) => Number(part));
-          const compare = (left, right) => {
-            for (let index = 0; index < 3; index += 1) {
-              if (left[index] !== right[index]) return left[index] - right[index];
-            }
-            return 0;
-          };
-          const increment = (value, type) => {
-            const [major, minor, patch] = parse(value);
-            if (type === "major") return `${major + 1}.0.0`;
-            if (type === "minor") return `${major}.${minor + 1}.0`;
-            return `${major}.${minor}.${patch + 1}`;
-          };
-
-          const base = published && compare(parse(published), parse(current)) > 0
-            ? published
-            : current;
-
-          process.stdout.write(increment(base, bump));
-        ' "$CURRENT_VERSION" "$PUBLISHED_VERSION" "${{ steps.version.outputs.bump }}")
-
-        echo "Resolved next version: $NEXT_VERSION"
-        npm version "$NEXT_VERSION" --no-git-tag-version
-
-        # Get new version
-        NEW_VERSION=$(node -p "require('./package.json').version")
-        echo "New version: $NEW_VERSION"
-
-        # Commit version change
-        git add package.json package-lock.json
-        git commit -m "chore: release v${NEW_VERSION} [skip ci]"
-
-        # Publish to NPM using OIDC (no token needed!)
         npm publish --access public
-
-        # Create and push release metadata only after publish succeeds
-        git tag "v${NEW_VERSION}"
-        git push origin HEAD:main
-        git push origin "v${NEW_VERSION}"
