@@ -38,6 +38,7 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs",
     "lint:fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix",
+    "prepare": "husky",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -66,8 +67,8 @@
     "@fortawesome/vue-fontawesome": "^3.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "pinia": "^3.0.3",
     "lucide-vue-next": "^0.292.0",
+    "pinia": "^3.0.3",
     "tailwind-merge": "3.3.1",
     "vue-router": "^4.5.1"
   },
@@ -90,6 +91,7 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^9.31.0",
     "eslint-plugin-vue": "~10.3.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
