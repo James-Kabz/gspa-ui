@@ -1,0 +1,13 @@
+<template>
+  <div :class="cn('p-6 pt-0 ui-text', $attrs.class)">
+    <slot />
+  </div>
+</template>
+
+<script setup>
+import { cn } from '../utils/cn.js'
+
+defineOptions({
+  inheritAttrs: false
+})
+</script>
