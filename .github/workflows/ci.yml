@@ -155,4 +155,9 @@ jobs:
 
     - name: Publish package to npm
       run: |
-        npm publish --access public
+        PACKAGE_VERSION="$(node -p \"require('./package.json').version\")"
+        if npm view "@gspa/ui@$PACKAGE_VERSION" version >/dev/null 2>&1; then
+          echo "@gspa/ui@$PACKAGE_VERSION is already published; skipping publish."
+        else
+          npm publish --access public
+        fi
