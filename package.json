@@ -67,18 +67,12 @@
     "@fortawesome/vue-fontawesome": "^3.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "lucide-vue-next": "^0.292.0",
     "pinia": "^3.0.3",
     "tailwind-merge": "3.3.1",
     "vue-router": "^4.5.1"
   },
   "peerDependencies": {
     "vue": "^3.5.18"
-  },
-  "peerDependenciesMeta": {
-    "lucide-vue-next": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
