@@ -14,7 +14,15 @@ const props = defineProps({
   },
   logoUrl: {
     type: String,
-    default: '/applogo.png'
+    default: null
+  },
+  secondaryLogoUrl: {
+    type: String,
+    default: null
+  },
+  secondaryLogoAlt: {
+    type: String,
+    default: 'Secondary logo'
   },
   quote: {
     type: String,
@@ -22,7 +30,7 @@ const props = defineProps({
   },
   backgroundImage: {
     type: String,
-    default: '/stlbacklogo.jpeg'
+    default: null
   },
   backgroundOpacity: {
     type: Number,
@@ -30,7 +38,7 @@ const props = defineProps({
   },
   appName: {
     type: String,
-    default: 'applogo'
+    default: 'Application'
   },
   appVersion: {
     type: String,
@@ -38,7 +46,7 @@ const props = defineProps({
   },
   copyright: {
     type: String,
-    default: 'Software Technologies Limited'
+    default: null
   },
   showFooter: {
     type: Boolean,
@@ -47,6 +55,18 @@ const props = defineProps({
 })
 
 const currentYear = computed(() => new Date().getFullYear())
+const backgroundStyle = computed(() => {
+  const opacity = Number.isFinite(props.backgroundOpacity)
+    ? Math.min(1, Math.max(0, props.backgroundOpacity))
+    : 1
+
+  return {
+    backgroundImage: props.backgroundImage
+      ? `url(${JSON.stringify(props.backgroundImage)})`
+      : undefined,
+    opacity
+  }
+})
 const displayVersion = computed(() => {
   const version = String(props.appVersion ?? '').trim()
   if (!version) return 'v0.0.0'
@@ -68,11 +88,9 @@ onBeforeUnmount(() => {
   <div class="relative min-h-screen overflow-hidden">
     <div
       class="absolute inset-0 bg-cover bg-center"
-      :style="{
-        backgroundImage: `url('${backgroundImage}')`,
-      }"
+      :style="backgroundStyle"
     />
-    <div class="absolute inset-0 " />
+    <div class="absolute inset-0" />
 
     <div class="relative z-10 mx-auto flex min-h-screen w-full max-w-[1400px] items-center px-4 py-4 sm:px-8 sm:py-6 lg:px-14">
       <section class="hidden w-full max-w-4xl pr-10 lg:block">
@@ -90,13 +108,15 @@ onBeforeUnmount(() => {
           <div class="px-1 sm:pt-2">
             <div class="flex items-start justify-between gap-2">
               <img
+                v-if="logoUrl"
                 :src="logoUrl"
-                alt="App logo"
+                :alt="`${appName} logo`"
                 class="h-16 w-auto max-w-[220px] object-contain sm:h-36"
               >
               <img
-                src="/logo.png"
-                alt="Software logo"
+                v-if="secondaryLogoUrl"
+                :src="secondaryLogoUrl"
+                :alt="secondaryLogoAlt"
                 class="h-8 w-auto object-contain sm:h-32"
               >
             </div>
@@ -162,11 +182,11 @@ onBeforeUnmount(() => {
         </div>
 
         <Typography
-          v-if="showFooter"
+          v-if="showFooter && copyright"
           variant="body-md"
           class="mt-3 text-center text-sm font-light leading-none text-white sm:text-[16px]"
         >
-          &copy; {{ copyright }} 2011 - {{ currentYear }}
+          &copy; {{ copyright }} {{ currentYear }}
         </Typography>
       </section>
     </div>

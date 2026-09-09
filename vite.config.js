@@ -13,6 +13,8 @@ const __dirname = dirname(__filename)
 export default defineConfig({
   plugins: [vue(), vueJsx(), tailwindcss()],
   build: {
+    // Demo assets live in public/, but library consumers provide their own branding.
+    copyPublicDir: false,
     lib: {
       entry: resolve(__dirname, "src/index.js"),
       name: "VueUI",
@@ -26,6 +28,8 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "vue",
+        "pinia",
+        "vue-router",
         "class-variance-authority",
         "clsx", 
         "tailwind-merge"
@@ -34,6 +38,8 @@ export default defineConfig({
         exports: "named",
         globals: {
           vue: "Vue",
+          pinia: "Pinia",
+          "vue-router": "VueRouter",
           "class-variance-authority": "ClassVarianceAuthority",
           "clsx": "clsx",
           "tailwind-merge": "tailwindMerge"
