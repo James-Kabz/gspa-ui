@@ -190,6 +190,24 @@ describe('Component', () => {
 
 This document provides comprehensive usage examples and API reference for all Vue components and directives in GSPA UI.
 
+## Importing components
+
+Import individual components when the application does not need the global plugin. Granular exports keep unrelated components out of the application bundle:
+
+```js
+import Button from '@gspa/ui/components/Button'
+import AuthLayout from '@gspa/ui/layouts/AuthLayout'
+import '@gspa/ui/css'
+```
+
+Nested components use the same convention:
+
+```js
+import BarChart from '@gspa/ui/components/charts/BarChart'
+```
+
+Named imports from `@gspa/ui` remain tree-shakeable. The default `VueUI` plugin intentionally registers every component and should only be used when an application needs the complete library.
+
 ## Button Authorization Access Control
 
 `Button` supports access-control props directly:
