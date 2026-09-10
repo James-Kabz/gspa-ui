@@ -200,6 +200,23 @@ import AuthLayout from '@gspa/ui/layouts/AuthLayout'
 import '@gspa/ui/css'
 ```
 
+For a small entry point, import component CSS instead of the complete utility sheet:
+
+```js
+import Button from '@gspa/ui/components/Button'
+import '@gspa/ui/css/button'
+```
+
+Granular styles are available for `button`, `input`, `form-field`, and `auth-layout`. `@gspa/ui/css/tokens` contains only semantic theme tokens and shared accessibility rules. Scoped legacy styles can be loaded through `@gspa/ui/css/scoped/<Component>` when that component needs them.
+
+Form controls include their validation and password icons, so authentication forms do not require global Font Awesome registration. For custom `Icon` names, applications may retain Font Awesome or provide a component adapter once:
+
+```js
+app.use(VueUI, {
+  iconAdapter: ({ name, prefix }) => myIconRegistry[prefix]?.[name]
+})
+```
+
 Nested components use the same convention:
 
 ```js

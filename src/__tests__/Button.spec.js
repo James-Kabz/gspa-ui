@@ -7,6 +7,19 @@ describe('Button', () => {
   it('renders with default props', () => {
     const wrapper = mount(Button)
     expect(wrapper.exists()).toBe(true)
+    expect(wrapper.attributes('type')).toBe('button')
+  })
+
+  it('supports native submit and reset button types', () => {
+    expect(mount(Button, { props: { type: 'submit' } }).attributes('type')).toBe('submit')
+    expect(mount(Button, { props: { type: 'reset' } }).attributes('type')).toBe('reset')
+  })
+
+  it('announces its loading state', () => {
+    const wrapper = mount(Button, { props: { loading: true, loadingLabel: 'Saving changes' } })
+    expect(wrapper.attributes('aria-busy')).toBe('true')
+    expect(wrapper.get('[role="status"]').text()).toBe('Saving changes')
+    expect(wrapper.get('svg').attributes('aria-hidden')).toBe('true')
   })
 
   it('applies variant class', () => {

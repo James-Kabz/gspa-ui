@@ -1,2 +1,1 @@
-export const AUTH_RESOLVER_KEY = "kabzAuthResolver"
-
+export const AUTH_RESOLVER_KEY = 'kabzAuthResolver'

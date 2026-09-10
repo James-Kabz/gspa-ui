@@ -557,7 +557,28 @@ const handleCancel = () => emit('cancel')
                         :disabled="isTrailingIconDisabled(field)"
                         @click="handleTrailingIconClick(field)"
                       >
+                        <svg
+                          v-if="isPasswordField(field)"
+                          class="h-4 w-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            v-if="isPasswordVisible(field)"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 3l18 18M10.6 10.7a2 2 0 002.7 2.7M9.9 4.2A10.7 10.7 0 0112 4c5 0 8.7 4.4 9.6 6.5.2.3.2.7 0 1a15 15 0 01-2.2 3.3M6.2 6.2A15.8 15.8 0 002.4 10.5c-.2.3-.2.7 0 1C3.3 13.6 7 18 12 18c1 0 2-.2 2.9-.5"
+                          />
+                          <template v-else>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.4 10.5C3.3 8.4 7 4 12 4s8.7 4.4 9.6 6.5c.2.3.2.7 0 1C20.7 13.6 17 18 12 18s-8.7-4.4-9.6-6.5a1.1 1.1 0 010-1z" />
+                            <circle cx="12" cy="11" r="3" stroke-width="2" />
+                          </template>
+                        </svg>
                         <font-awesome-icon
+                          v-else
                           :icon="getTrailingIcon(field)"
                           :class="getTrailingIconClass(field)"
                         />

@@ -7,6 +7,13 @@ describe('Alert', () => {
     const wrapper = mount(Alert)
     const alertDiv = wrapper.find('[role="alert"]')
     expect(alertDiv.exists()).toBe(true)
+    expect(alertDiv.attributes('aria-live')).toBe('polite')
+    expect(alertDiv.attributes('aria-atomic')).toBe('true')
+  })
+
+  it('assertively announces error alerts', () => {
+    const wrapper = mount(Alert, { props: { variant: 'error', message: 'Unable to save' } })
+    expect(wrapper.get('[role="alert"]').attributes('aria-live')).toBe('assertive')
   })
 
   it('displays title and message', () => {

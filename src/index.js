@@ -94,8 +94,19 @@ import ReminderConfig from "./components/ReminderConfig.vue"
 
 // Import toast function and composable (not a component!)
 import { toast, useToaster } from './lib/toast'
-import { initTheme, setTheme, setMode, getTheme, getMode } from './lib/theme'
+import {
+  THEME_PRESETS,
+  buildThemeTokens,
+  clearTheme,
+  getMode,
+  getTheme,
+  getThemePreset,
+  initTheme,
+  setMode,
+  setTheme
+} from './lib/theme'
 import { AUTH_RESOLVER_KEY } from "./lib/auth.js"
+import { ICON_ADAPTER_KEY } from "./lib/icon.js"
 import { tooltip } from "./directives/tooltip.js"
 // Utils
 export { cn } from "./utils/cn.js"
@@ -276,9 +287,10 @@ const createFallbackAuthResolver = (options = {}) => {
 }
 
 // Plugin installer
+/** @type {import('./types.js').VueUIPlugin} */
 const VueUI = {
   install(app, options = {}) {
-    const { prefix = "", authResolver = null } = options
+    const { prefix = "", authResolver = null, iconAdapter = null } = options
     const resolvedAuthResolver =
       typeof authResolver === "function" ? authResolver : createFallbackAuthResolver(options)
     
@@ -296,6 +308,7 @@ const VueUI = {
     app.config.globalProperties.$authResolver = resolvedAuthResolver
     app.config.globalProperties.$canAccess = resolvedAuthResolver
     app.provide(AUTH_RESOLVER_KEY, resolvedAuthResolver)
+    app.provide(ICON_ADAPTER_KEY, iconAdapter)
   },
 }
 
@@ -400,9 +413,16 @@ export {
   setMode,
   getTheme,
   getMode,
+  getThemePreset,
+  buildThemeTokens,
+  clearTheme,
+  THEME_PRESETS,
   // Export toast function and composable
   toast,
   useToaster,
   tooltip,
-  AUTH_RESOLVER_KEY
+  AUTH_RESOLVER_KEY,
+  ICON_ADAPTER_KEY
 }
+
+export * from './types.js'

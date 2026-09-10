@@ -1,6 +1,14 @@
 <template>
+  <component
+    :is="adaptedIcon"
+    v-if="adaptedIcon"
+    :class="iconClasses"
+    :aria-hidden="!ariaLabel"
+    :aria-label="ariaLabel"
+    :role="ariaLabel ? 'img' : undefined"
+  />
   <font-awesome-icon
-    v-if="resolvedIcon"
+    v-else-if="resolvedIcon"
     :icon="[prefix, resolvedIcon]"
     :size="faSize"
     :class="iconClasses"
@@ -11,8 +19,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { ICON_ADAPTER_KEY } from '../lib/icon.js'
 
 const props = defineProps({
   icon: {
@@ -36,6 +45,11 @@ const props = defineProps({
 })
 
 const resolvedIcon = computed(() => props.icon || props.name)
+const iconAdapter = inject(ICON_ADAPTER_KEY, null)
+const adaptedIcon = computed(() => {
+  if (typeof iconAdapter !== 'function' || !resolvedIcon.value) return null
+  return iconAdapter({ name: resolvedIcon.value, prefix: props.prefix })
+})
 
 const faSize = computed(() => {
   const sizes = {

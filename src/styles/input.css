@@ -1,4 +1,3 @@
 @import "tailwindcss" source(none);
-@source "../components";
-@source "../layouts";
+@source "../components/Input.vue";
 @import "./tokens.css";

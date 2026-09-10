@@ -3,6 +3,14 @@ import { ref } from 'vue'
 
 const copied = ref(false)
 
+const academyPalette = [
+  { name: 'Institutional navy', value: '#173866', class: 'bg-[#173866]' },
+  { name: 'Credential gold', value: '#B98218', class: 'bg-[#b98218]' },
+  { name: 'Cyber', value: '#176B87', class: 'bg-[#176b87]' },
+  { name: 'Success', value: '#14745D', class: 'bg-[#14745d]' },
+  { name: 'Canvas', value: '#F5F7FB', class: 'bg-[#f5f7fb]' }
+]
+
 const treeShaking = `import { createApp } from 'vue'
 import App from './App.vue'
 import { Button, Input, Card } from '@gspa/ui'
@@ -28,12 +36,33 @@ const copySnippet = async () => {
 <template>
   <div class="space-y-8">
     <article class="rounded-2xl border ui-border-strong ui-surface p-6">
-      <h1 class="text-3xl font-bold">
+      <p class="ui-eyebrow">
+        Design system
+      </p>
+      <h1 class="ui-display-title mt-2 text-3xl">
         Theming
       </h1>
       <p class="mt-3 max-w-4xl text-lg leading-8 ui-text-muted">
-        GSPA UI theme behavior is controlled by exported helpers: `initTheme`, `setTheme`, `setMode`, `getTheme`, and `getMode`.
+        Security Academy is the default preset: institutional navy, credential gold, cool neutral surfaces, and restrained visual hierarchy for serious professional learning.
       </p>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div
+          v-for="color in academyPalette"
+          :key="color.name"
+          class="overflow-hidden rounded-lg border ui-border"
+        >
+          <div :class="['h-16', color.class]" />
+          <div class="ui-surface px-3 py-2">
+            <div class="text-xs font-semibold ui-text">
+              {{ color.name }}
+            </div>
+            <div class="mt-0.5 font-mono text-[11px] ui-text-muted">
+              {{ color.value }}
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="mt-4 rounded-xl border ui-border-strong bg-black/92 p-4">
         <div class="mb-2 flex items-center justify-between gap-3">

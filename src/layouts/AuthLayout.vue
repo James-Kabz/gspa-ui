@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { computed, getCurrentInstance, onBeforeUnmount, onMounted } from 'vue'
 import Typography from '../components/Typography.vue'
 import Divider from '../components/Divider.vue'
 
@@ -55,6 +55,7 @@ const props = defineProps({
 })
 
 const currentYear = computed(() => new Date().getFullYear())
+const routerViewComponent = getCurrentInstance()?.appContext.components.RouterView || null
 const backgroundStyle = computed(() => {
   const opacity = Number.isFinite(props.backgroundOpacity)
     ? Math.min(1, Math.max(0, props.backgroundOpacity))
@@ -85,19 +86,19 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="relative min-h-screen overflow-hidden">
+  <div class="relative min-h-screen overflow-hidden bg-(--ui-auth-background)">
     <div
       class="absolute inset-0 bg-cover bg-center"
       :style="backgroundStyle"
     />
-    <div class="absolute inset-0" />
+    <div class="absolute inset-0 bg-(--ui-auth-background)/20" />
 
     <div class="relative z-10 mx-auto flex min-h-screen w-full max-w-[1400px] items-center px-4 py-4 sm:px-8 sm:py-6 lg:px-14">
       <section class="hidden w-full max-w-4xl pr-10 lg:block">
         <Typography
           v-if="quote"
           variant="body-xl"
-          class="max-w-3xl text-2xl leading-[1.4] font-light tracking-wide text-white/90 xl:text-[38px]"
+          class="max-w-3xl text-2xl leading-[1.4] font-light tracking-wide ui-text-inverse opacity-90 xl:text-[38px]"
         >
           "{{ quote }}"
         </Typography>
@@ -128,14 +129,14 @@ onBeforeUnmount(() => {
                 <Typography
                   variant="text-xl"
                   align="center"
-                  class="font-normal leading-tight text-[#1f2328] text-center"
+                  class="font-normal leading-tight ui-text text-center"
                 >
                   {{ title }}
                 </Typography>
                 <Typography
                   v-if="subtitle"
                   variant="body-sm"
-                  class="mt-1 text-xs leading-normal text-[#5f6a74]"
+                  class="mt-1 text-xs leading-normal ui-text-muted"
                 >
                   {{ subtitle }}
                 </Typography>
@@ -145,12 +146,14 @@ onBeforeUnmount(() => {
 
           <Divider
             size="sm"
-            class="my-0 bg-[#c7ccd2]"
+            class="my-0 bg-(--ui-border-strong)"
           />
 
           <div class="px-5 py-4 sm:px-6 sm:py-2">
             <div class="space-y-4">
-              <router-view />
+              <slot>
+                <component :is="routerViewComponent" v-if="routerViewComponent" />
+              </slot>
             </div>
           </div>
 
@@ -167,7 +170,7 @@ onBeforeUnmount(() => {
             <Typography
               v-if="showFooter"
               variant="body-md"
-              class="mt-2 text-right text-xs font-light leading-none text-[#5f6a74] sm:text-[14px]"
+              class="mt-2 text-right text-xs font-light leading-none ui-text-muted sm:text-[14px]"
             >
               {{ displayVersion }}
             </Typography>
@@ -184,7 +187,7 @@ onBeforeUnmount(() => {
         <Typography
           v-if="showFooter && copyright"
           variant="body-md"
-          class="mt-3 text-center text-sm font-light leading-none text-white sm:text-[16px]"
+          class="mt-3 text-center text-sm font-light leading-none ui-text-inverse sm:text-[16px]"
         >
           &copy; {{ copyright }} {{ currentYear }}
         </Typography>
@@ -192,11 +195,3 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-:global(html.auth-page),
-:global(body.auth-page) {
-  background-color: #1e1a18;
-  overscroll-behavior-y: none;
-}
-</style>

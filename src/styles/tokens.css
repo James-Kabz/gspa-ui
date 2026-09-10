@@ -1,0 +1,375 @@
+@theme {
+  --font-sans: "Inter", "Aptos", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+
+  --blur-2xs: 2px;
+  --blur-xs: 4px;
+  --blur-sm: 8px;
+  --blur-md: 12px;
+  --blur-lg: 16px;
+  --blur-xl: 24px;
+  --blur-2xl: 40px;
+  --blur-3xl: 64px;
+  --blur-4xl: 96px;
+  --blur-modal: 100px;
+}
+
+.font-sans-custom {
+  font-family: var(--font-sans);
+}
+.font-serif-custom {
+  font-family: var(--font-serif);
+}
+.font-mono-custom {
+  font-family: var(--font-mono);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html[data-mode="dark"] {
+    color-scheme: dark;
+  }
+
+  html {
+    /* Security Academy: institutional, calm, and information-dense. */
+    --ui-bg: #f5f7fb;
+    --ui-surface: #ffffff;
+    --ui-surface-muted: #f0f3f8;
+    --ui-surface-soft: #e8edf5;
+    --ui-surface-strong: #173866;
+
+    --ui-text: #172033;
+    --ui-text-muted: #5b687a;
+    --ui-text-soft: #78869a;
+
+    --ui-border: #dce3ed;
+    --ui-border-strong: #c6d1df;
+    --ui-ring: #c6922c;
+
+    --ui-primary: #173866;
+    --ui-primary-strong: #0e294f;
+    --ui-primary-soft: #e6edf7;
+    --ui-primary-contrast: #ffffff;
+
+    --ui-accent: #b98218;
+    --ui-accent-strong: #835b0e;
+    --ui-accent-soft: #fff3d1;
+    --ui-accent-contrast: #172033;
+
+    --ui-success: #14745d;
+    --ui-success-strong: #0d5745;
+    --ui-success-soft: #def3eb;
+    --ui-success-contrast: #ffffff;
+
+    --ui-warning: #a96008;
+    --ui-warning-strong: #7c4504;
+    --ui-warning-soft: #fff0d6;
+    --ui-warning-contrast: #ffffff;
+
+    --ui-danger: #b4233c;
+    --ui-danger-strong: #861a2d;
+    --ui-danger-soft: #fde7eb;
+    --ui-danger-contrast: #ffffff;
+
+    --ui-cyber: #176b87;
+    --ui-cyber-soft: #e0f2f7;
+    --ui-physical: #9a6a17;
+    --ui-physical-soft: #fff2cf;
+    --ui-credential: #b98218;
+    --ui-credential-soft: #fff3d1;
+
+    --ui-text-inverse: #ffffff;
+    --ui-auth-background: #102b50;
+    --ui-header-bg: #ffffff;
+    --ui-sidebar-bg: #edf2f8;
+    --ui-submenu-bg: #e4ebf4;
+
+    --ui-shadow-sm: 0 1px 2px rgb(16 35 62 / 0.06);
+    --ui-shadow-md: 0 8px 24px rgb(16 35 62 / 0.10);
+    --ui-shadow-lg: 0 18px 48px rgb(16 35 62 / 0.14);
+  }
+
+  html[data-mode="dark"] {
+    --ui-bg: #07152a;
+    --ui-surface: #0d203b;
+    --ui-surface-muted: #122744;
+    --ui-surface-soft: #19304f;
+    --ui-surface-strong: #24436d;
+
+    --ui-text: #f3f6fb;
+    --ui-text-muted: #bbc7d9;
+    --ui-text-soft: #8fa0b8;
+
+    --ui-border: #263d5d;
+    --ui-border-strong: #365172;
+    --ui-ring: #e2b84e;
+
+    --ui-primary: #e2b84e;
+    --ui-primary-strong: #f0ca68;
+    --ui-primary-soft: #3b3524;
+    --ui-primary-contrast: #101d31;
+
+    --ui-accent: #8db0e1;
+    --ui-accent-strong: #b2caea;
+    --ui-accent-soft: #213a5f;
+    --ui-accent-contrast: #101d31;
+
+    --ui-success: #65c7a5;
+    --ui-success-strong: #89d8bd;
+    --ui-success-soft: #143e3a;
+    --ui-success-contrast: #0b251e;
+
+    --ui-warning: #efb45f;
+    --ui-warning-strong: #f5ca88;
+    --ui-warning-soft: #46371f;
+    --ui-warning-contrast: #251704;
+
+    --ui-danger: #f08395;
+    --ui-danger-strong: #f5a5b2;
+    --ui-danger-soft: #482431;
+    --ui-danger-contrast: #2b0710;
+
+    --ui-cyber: #72c3dc;
+    --ui-cyber-soft: #17394b;
+    --ui-physical: #e2b84e;
+    --ui-physical-soft: #3b3524;
+    --ui-credential: #e2b84e;
+    --ui-credential-soft: #3b3524;
+
+    --ui-text-inverse: #ffffff;
+    --ui-auth-background: #061326;
+    --ui-header-bg: #0a1b33;
+    --ui-sidebar-bg: #09192f;
+    --ui-submenu-bg: #122744;
+
+    --ui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.24);
+    --ui-shadow-md: 0 10px 28px rgb(0 0 0 / 0.30);
+    --ui-shadow-lg: 0 20px 56px rgb(0 0 0 / 0.38);
+  }
+
+  body {
+    background-color: var(--ui-bg);
+    color: var(--ui-text);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--ui-accent-soft);
+    color: var(--ui-text);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ui-ring);
+    outline-offset: 2px;
+  }
+}
+
+.ui-field-message-enter-active,
+.ui-field-message-leave-active {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.ui-field-message-enter-from,
+.ui-field-message-leave-to {
+  opacity: 0;
+  transform: translateY(-0.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+html.auth-page,
+body.auth-page {
+  background-color: var(--ui-auth-background);
+  overscroll-behavior-y: none;
+}
+
+@layer components {
+  .ui-surface {
+    background-color: var(--ui-surface);
+    color: var(--ui-text);
+  }
+  .ui-bg {
+    background-color: var(--ui-bg);
+    color: var(--ui-text);
+  }
+
+  .ui-surface-muted {
+    background-color: var(--ui-surface-muted);
+  }
+
+  .ui-surface-soft {
+    background-color: var(--ui-surface-soft);
+  }
+
+  .ui-surface-strong {
+    background-color: var(--ui-surface-strong);
+    color: var(--ui-text-inverse);
+  }
+
+  .ui-header-bg {
+    background-color: var(--ui-header-bg);
+  }
+
+  .ui-sidebar-bg {
+    background-color: var(--ui-sidebar-bg);
+  }
+
+  .ui-submenu-bg {
+    background-color: var(--ui-submenu-bg);
+  }
+
+  .ui-panel {
+    background-color: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: 0.625rem;
+    box-shadow: var(--ui-shadow-sm);
+  }
+
+  .ui-text {
+    color: var(--ui-text);
+  }
+
+  .ui-text-muted {
+    color: var(--ui-text-muted);
+  }
+
+  .ui-text-soft {
+    color: var(--ui-text-soft);
+  }
+
+  .ui-text-inverse {
+    color: var(--ui-text-inverse);
+  }
+
+  .ui-border {
+    border-color: var(--ui-border);
+  }
+
+  .ui-border-strong {
+    border-color: var(--ui-border-strong);
+  }
+
+  .ui-border-surface {
+    border-color: var(--ui-surface);
+  }
+
+  .ui-border-strong-bg {
+    background-color: var(--ui-border-strong);
+  }
+
+  .ui-primary {
+    color: var(--ui-primary);
+  }
+
+  .ui-primary-bg {
+    background-color: var(--ui-primary);
+    color: var(--ui-primary-contrast);
+  }
+
+  .ui-primary-soft {
+    background-color: var(--ui-primary-soft);
+    color: var(--ui-primary-strong);
+  }
+
+  .ui-accent {
+    color: var(--ui-accent);
+  }
+
+  .ui-accent-bg {
+    background-color: var(--ui-accent);
+    color: var(--ui-accent-contrast);
+  }
+
+  .ui-accent-soft {
+    background-color: var(--ui-accent-soft);
+    color: var(--ui-accent-strong);
+  }
+
+  .ui-success {
+    color: var(--ui-success);
+  }
+
+  .ui-success-bg {
+    background-color: var(--ui-success);
+    color: var(--ui-success-contrast);
+  }
+
+  .ui-success-soft {
+    background-color: var(--ui-success-soft);
+    color: var(--ui-success-strong);
+  }
+
+  .ui-warning {
+    color: var(--ui-warning);
+  }
+
+  .ui-warning-bg {
+    background-color: var(--ui-warning);
+    color: var(--ui-warning-contrast);
+  }
+
+  .ui-warning-soft {
+    background-color: var(--ui-warning-soft);
+    color: var(--ui-warning-strong);
+  }
+
+  .ui-danger {
+    color: var(--ui-danger);
+  }
+
+  .ui-danger-bg {
+    background-color: var(--ui-danger);
+    color: var(--ui-danger-contrast);
+  }
+
+  .ui-danger-soft {
+    background-color: var(--ui-danger-soft);
+    color: var(--ui-danger-strong);
+  }
+
+  .ui-domain-cyber {
+    background-color: var(--ui-cyber-soft);
+    color: var(--ui-cyber);
+  }
+
+  .ui-domain-physical {
+    background-color: var(--ui-physical-soft);
+    color: var(--ui-physical);
+  }
+
+  .ui-credential {
+    background-color: var(--ui-credential-soft);
+    color: var(--ui-credential);
+  }
+
+  .ui-eyebrow {
+    color: var(--ui-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1.35;
+    text-transform: uppercase;
+  }
+
+  .ui-display-title {
+    color: var(--ui-primary);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+  }
+}

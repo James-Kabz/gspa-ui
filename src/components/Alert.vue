@@ -11,6 +11,8 @@
       v-if="visible"
       :class="cn(alertVariants({ variant }), $attrs.class)"
       role="alert"
+      :aria-live="variant === 'error' || variant === 'danger' ? 'assertive' : 'polite'"
+      aria-atomic="true"
     >
       <div class="flex items-start gap-3">
         <!-- Icon -->
@@ -59,6 +61,7 @@
         <!-- Dismiss button -->
         <button
           v-if="dismissible"
+          type="button"
           :class="dismissButtonClasses"
           :aria-label="dismissLabel"
           @click="handleDismiss"
@@ -71,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, computed, h } from 'vue'
+import { ref, computed, h, onBeforeUnmount } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 import Button from './Button.vue'
@@ -109,10 +112,12 @@ const handleActionClick = (action) => {
 }
 
 // Auto close
+let autoCloseTimer
 if (props.autoClose) {
   const delay = typeof props.autoClose === 'number' ? props.autoClose : 5000
-  setTimeout(handleDismiss, delay)
+  autoCloseTimer = setTimeout(handleDismiss, delay)
 }
+onBeforeUnmount(() => clearTimeout(autoCloseTimer))
 
 /* ===== Icons ===== */
 const InfoIcon = {

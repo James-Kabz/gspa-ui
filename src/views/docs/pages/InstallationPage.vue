@@ -31,20 +31,12 @@ import VueUI, { tooltip, initTheme } from '${packageName}'
 import '${packageName}/css'
 import './styles/style.css'
 import VueApexCharts from 'vue3-apexcharts'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-import { fab } from '@fortawesome/free-brands-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-
-library.add(fas, far, fab)
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
 
-app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(VueApexCharts)
 app.use(VueUI, {
   authResolver: ({ permission, role, requireAll }) => {
@@ -78,7 +70,7 @@ const copySnippet = async (key, content) => {
         Installation
       </h1>
       <p class="mt-3 text-lg leading-8 ui-text-muted">
-        Install {{ packageDisplayName }}, then register plugin, icons, and tooltip directive.
+        Install {{ packageDisplayName }}, then register the plugin and tooltip directive. Form controls bring their own icons.
       </p>
 
       <div class="mt-4 flex flex-wrap gap-2">
@@ -117,8 +109,11 @@ const copySnippet = async (key, content) => {
 
     <article class="rounded-2xl border ui-border-strong ui-surface p-6">
       <h2 class="text-2xl font-bold">
-        Font Awesome Dependencies
+        Optional Font Awesome Integration
       </h2>
+      <p class="mt-2 ui-text-muted">
+        Only install Font Awesome when using custom names through the Icon component. FormField and Input do not need global icon registration.
+      </p>
 
       <div class="mt-4 rounded-xl border ui-border-strong bg-black/92 p-4">
         <div class="mb-2 flex items-center justify-between gap-3">

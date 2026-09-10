@@ -54,7 +54,7 @@ describe('Input', () => {
       props: { variant: 'error' }
     })
     const input = wrapper.find('input')
-    expect(input.classes()).toContain('border-(--ui-danger-soft)')
+    expect(input.classes()).toContain('border-(--ui-danger)')
   })
 
   it('shows clear button when clearable and has value', async () => {
@@ -92,6 +92,27 @@ describe('Input', () => {
       props: { variant: 'success' }
     })
     const input = wrapper.find('input')
-    expect(input.classes()).toContain('border-(--ui-success-soft)')
+    expect(input.classes()).toContain('border-(--ui-success)')
+  })
+
+  it('renders and describes standalone server validation', () => {
+    const wrapper = mount(Input, {
+      props: { id: 'username', serverError: 'Username is already used', helpText: 'Choose a unique name' }
+    })
+    const input = wrapper.get('input')
+
+    expect(input.attributes('aria-invalid')).toBe('true')
+    expect(input.attributes('aria-describedby')).toBe('username-error')
+    expect(wrapper.get('[role="alert"]').text()).toBe('Username is already used')
+  })
+
+  it('supports browser form metadata and disabled behavior', () => {
+    const wrapper = mount(Input, {
+      props: { id: 'email', name: 'email', autocomplete: 'email', disabled: true, required: true }
+    })
+
+    expect(wrapper.get('input').attributes()).toMatchObject({
+      name: 'email', autocomplete: 'email', disabled: '', required: ''
+    })
   })
 })

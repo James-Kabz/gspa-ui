@@ -1,9 +1,10 @@
-<script setup>
-import { computed, inject } from 'vue'
+<script setup lang="ts">
+import { computed, inject, type PropType } from 'vue'
 import { cva } from 'class-variance-authority'
 import { cn } from '../utils/cn.js'
 import Icon from './Icon.vue'
 import { AUTH_RESOLVER_KEY } from '../lib/auth.js'
+import type { AuthResolver, AuthRule, ButtonSize, ButtonType, ButtonUnauthorizedBehavior, ButtonVariant } from '../types.js'
 
 defineOptions({
   inheritAttrs: false
@@ -11,9 +12,9 @@ defineOptions({
 
 const props = defineProps({
   variant: {
-    type: String,
+    type: String as PropType<ButtonVariant>,
     default: 'default',
-    validator: (value) =>
+    validator: (value: ButtonVariant) =>
       [
         'primary',
         'default',
@@ -35,9 +36,9 @@ const props = defineProps({
       ].includes(value),
   },
   size: {
-    type: String,
+    type: String as PropType<ButtonSize>,
     default: 'default',
-    validator: (value) =>
+    validator: (value: ButtonSize) =>
       ['2xs', 'xs', 'sm', 'default', 'md', 'lg', 'xl', '2xl', 'icon-sm', 'icon', 'icon-lg'].includes(value),
   },
   disabled: {
@@ -52,16 +53,24 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  loadingLabel: {
+    type: String,
+    default: 'Loading',
+  },
+  type: {
+    type: String as PropType<ButtonType>,
+    default: 'button',
+  },
   icon: {
     type: String,
     default: null,
   },
   permission: {
-    type: [String, Array, Boolean, Function],
+    type: [String, Array, Boolean, Function] as PropType<AuthRule>,
     default: null,
   },
   role: {
-    type: [String, Array, Boolean, Function],
+    type: [String, Array, Boolean, Function] as PropType<AuthRule>,
     default: null,
   },
   requireAll: {
@@ -69,15 +78,15 @@ const props = defineProps({
     default: false,
   },
   unauthorized: {
-    type: String,
+    type: String as PropType<ButtonUnauthorizedBehavior>,
     default: 'show',
-    validator: (value) => ['show', 'hide', 'disable'].includes(value),
+    validator: (value: ButtonUnauthorizedBehavior) => ['show', 'hide', 'disable'].includes(value),
   },
 })
 
-const authResolver = inject(AUTH_RESOLVER_KEY, null)
+const authResolver = inject(AUTH_RESOLVER_KEY, null) as AuthResolver | null
 
-const normalizeRule = (rule) => {
+const normalizeRule = (rule: AuthRule) => {
   if (rule === null || rule === undefined) return null
   if (typeof rule === 'boolean') return rule
   if (typeof rule === 'function') return !!rule()
@@ -226,6 +235,7 @@ const spinnerSizeClass = computed(() => {
     v-if="!shouldHide"
     :class="cn(buttonVariants({ variant, size }), $attrs.class)"
     :disabled="isDisabled"
+    :type="type"
     :aria-disabled="isDisabled"
     :aria-busy="loading"
     v-bind="$attrs"
@@ -238,6 +248,7 @@ const spinnerSizeClass = computed(() => {
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
+      aria-hidden="true"
     >
       <circle
         class="opacity-25"
@@ -267,5 +278,6 @@ const spinnerSizeClass = computed(() => {
     <!-- Button content -->
     <span v-if="loading && loadingText">{{ loadingText }}</span>
     <slot v-else />
+    <span v-if="loading" class="sr-only" role="status" aria-live="polite">{{ loadingLabel }}</span>
   </button>
 </template>

@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/type-tests/**/*.ts", "src/**/*.vue", "src/**/*.js", "src/types.ts"],
+  "exclude": ["node_modules", "dist", "src/__tests__"],
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true
+  }
+}

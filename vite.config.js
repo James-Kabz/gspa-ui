@@ -13,6 +13,11 @@ const __dirname = dirname(__filename)
 
 const libraryEntries = {
   index: resolve(__dirname, "src/index.js"),
+  "styles/button": resolve(__dirname, "src/styles/button.css"),
+  "styles/input": resolve(__dirname, "src/styles/input.css"),
+  "styles/form-field": resolve(__dirname, "src/styles/form-field.css"),
+  "styles/auth-layout": resolve(__dirname, "src/styles/auth-layout.css"),
+  "styles/tokens": resolve(__dirname, "src/styles/tokens.css"),
 }
 
 const addLibraryEntries = (sourceDirectory, exportDirectory, extensions) => {
@@ -88,14 +93,13 @@ export default defineConfig({
           "clsx": "clsx",
           "tailwind-merge": "tailwindMerge"
         },
-        // Preserve CSS
         assetFileNames: (assetInfo) => {
-          if (assetInfo.names?.[0]?.endsWith('.css')) return 'gspa-ui.css';
+          if (assetInfo.names?.[0] === 'index.css') return 'gspa-ui.css';
           return assetInfo.names?.[0];
         },
       },
     },
-    cssCodeSplit: false,
+    cssCodeSplit: true,
   },
   resolve: {
     alias: {

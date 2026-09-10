@@ -1,6 +1,6 @@
 const MODE_KEY = 'ui-mode'
 const THEME_KEY = 'ui-theme'
-const DEFAULT_PRESET_KEY = 'ocean'
+const DEFAULT_PRESET_KEY = 'academy'
 
 const isBrowser = () => typeof document !== 'undefined'
 
@@ -16,7 +16,7 @@ export const getMode = () => {
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 
-const normalizeHex = (value, fallback = '#0070f3') => {
+const normalizeHex = (value, fallback = '#173866') => {
   if (!value) return fallback
   let hex = String(value).trim().replace('#', '')
   if (hex.length === 3) hex = hex.split('').map((char) => char + char).join('')
@@ -57,6 +57,12 @@ const getContrastText = (hex) => {
 }
 
 export const THEME_PRESETS = [
+  {
+    key: 'academy',
+    name: 'Security Academy',
+    light: { primary: '#173866', secondary: ['#b98218', '#14745d', '#a96008'] },
+    dark: { primary: '#e2b84e', secondary: ['#8db0e1', '#65c7a5', '#efb45f'] }
+  },
   {
     key: 'ocean',
     name: 'Ocean Blue',
@@ -103,8 +109,8 @@ export const buildThemeTokens = (theme = {}) => {
   const shouldForcePresetPalette = hasPreset && !useCustomPalette
 
   const primary = shouldForcePresetPalette
-    ? normalizeHex(presetPalette.primary, '#0070f3')
-    : normalizeHex(theme.primary || theme.primary_color || presetPalette.primary, '#0070f3')
+    ? normalizeHex(presetPalette.primary, '#173866')
+    : normalizeHex(theme.primary || theme.primary_color || presetPalette.primary, '#173866')
 
   const secondary = shouldForcePresetPalette
     ? presetPalette.secondary
@@ -116,35 +122,42 @@ export const buildThemeTokens = (theme = {}) => {
         theme.secondary_3 || presetPalette.secondary[2]
       ])
 
-  const secondary1 = normalizeHex(secondary?.[0], '#14b8a6')
-  const secondary2 = normalizeHex(secondary?.[1], '#f97316')
-  const secondary3 = normalizeHex(secondary?.[2], '#8b5cf6')
+  const secondary1 = normalizeHex(secondary?.[0], '#b98218')
+  const secondary2 = normalizeHex(secondary?.[1], '#14745d')
+  const secondary3 = normalizeHex(secondary?.[2], '#a96008')
   const isDarkMode = mode === 'dark'
+  const strongTarget = isDarkMode ? '#ffffff' : '#000000'
+  const softTarget = isDarkMode ? '#07152a' : '#ffffff'
+  const softWeight = isDarkMode ? 0.72 : 0.86
   const headerBg = isDarkMode
-    ? mixColors(primary, '#042438', 0.92)
+    ? mixColors(primary, '#0a1b33', 0.94)
     : '#ffffff'
   const sidebarBg = isDarkMode
-    ? mixColors(primary, '#031f31', 0.9)
-    : '#ffffff'
+    ? mixColors(primary, '#09192f', 0.94)
+    : '#edf2f8'
   const submenuBg = isDarkMode
-    ? mixColors(primary, '#03283e', 0.9)
-    : '#ffffff'
+    ? mixColors(primary, '#122744', 0.94)
+    : '#e4ebf4'
 
   return {
     '--ui-primary': primary,
-    '--ui-primary-strong': mixColors(primary, '#000000', 0.14),
-    '--ui-primary-soft': mixColors(primary, '#ffffff', 0.86),
+    '--ui-primary-strong': mixColors(primary, strongTarget, 0.14),
+    '--ui-primary-soft': mixColors(primary, softTarget, softWeight),
+    '--ui-primary-contrast': getContrastText(primary),
     '--ui-accent': secondary1,
-    '--ui-accent-strong': mixColors(secondary1, '#000000', 0.14),
-    '--ui-accent-soft': mixColors(secondary1, '#ffffff', 0.84),
+    '--ui-accent-strong': mixColors(secondary1, strongTarget, 0.14),
+    '--ui-accent-soft': mixColors(secondary1, softTarget, isDarkMode ? 0.72 : 0.84),
+    '--ui-accent-contrast': getContrastText(secondary1),
     '--ui-success': secondary2,
-    '--ui-success-strong': mixColors(secondary2, '#000000', 0.1),
-    '--ui-success-soft': mixColors(secondary2, '#ffffff', 0.84),
+    '--ui-success-strong': mixColors(secondary2, strongTarget, 0.1),
+    '--ui-success-soft': mixColors(secondary2, softTarget, isDarkMode ? 0.72 : 0.84),
+    '--ui-success-contrast': getContrastText(secondary2),
     '--ui-warning': secondary3,
-    '--ui-warning-strong': mixColors(secondary3, '#000000', 0.1),
-    '--ui-warning-soft': mixColors(secondary3, '#ffffff', 0.84),
+    '--ui-warning-strong': mixColors(secondary3, strongTarget, 0.1),
+    '--ui-warning-soft': mixColors(secondary3, softTarget, isDarkMode ? 0.72 : 0.84),
+    '--ui-warning-contrast': getContrastText(secondary3),
     '--ui-ring': mixColors(primary, '#ffffff', 0.28),
-    '--ui-text-inverse': getContrastText(primary),
+    '--ui-text-inverse': '#ffffff',
     '--ui-header-bg': headerBg,
     '--ui-sidebar-bg': sidebarBg,
     '--ui-submenu-bg': submenuBg

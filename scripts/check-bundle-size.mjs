@@ -42,13 +42,17 @@ const granularImportBytes = await bundleSize(`
   import Button from './dist/components/Button.js'
   console.log(Button)
 `)
+const cssBytes = (await stat(resolve(projectRoot, 'dist/gspa-ui.css'))).size
+const buttonCssBytes = (await stat(resolve(projectRoot, 'dist/styles/button.css'))).size
 
 const limits = {
   rootEntryBytes: 20_000,
   rootNamedImportBytes: 20_000,
-  granularImportBytes: 15_000
+  granularImportBytes: 15_000,
+  cssBytes: 100_000,
+  buttonCssBytes: 30_000
 }
-const measurements = { rootEntryBytes, rootNamedImportBytes, granularImportBytes }
+const measurements = { rootEntryBytes, rootNamedImportBytes, granularImportBytes, cssBytes, buttonCssBytes }
 const failures = Object.entries(measurements)
   .filter(([name, size]) => size > limits[name])
 

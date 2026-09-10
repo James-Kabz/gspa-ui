@@ -7,7 +7,6 @@ const mountLayout = (props = {}) => mount(AuthLayout, {
   global: {
     stubs: {
       Divider: true,
-      RouterView: true,
       Typography: {
         template: '<div><slot /></div>'
       }
@@ -55,5 +54,36 @@ describe('AuthLayout', () => {
     const wrapper = mountLayout({ backgroundOpacity: 4 })
 
     expect(wrapper.find('.bg-cover').attributes('style')).toContain('opacity: 1')
+  })
+
+  it('renders page content from the default slot without Vue Router', () => {
+    const wrapper = mount(AuthLayout, {
+      props: { title: 'Sign in' },
+      slots: { default: '<form data-testid="auth-form">Authentication form</form>' },
+      global: { stubs: { Divider: true, Typography: { template: '<div><slot /></div>' } } }
+    })
+
+    expect(wrapper.get('[data-testid="auth-form"]').text()).toBe('Authentication form')
+    expect(wrapper.find('router-view-stub').exists()).toBe(false)
+  })
+
+  it('uses an installed RouterView only when no default slot is supplied', () => {
+    const wrapper = mount(AuthLayout, {
+      global: {
+        components: { RouterView: { template: '<main data-testid="route-page">Route page</main>' } },
+        stubs: { Divider: true, Typography: { template: '<div><slot /></div>' } }
+      }
+    })
+
+    expect(wrapper.get('[data-testid="route-page"]').text()).toBe('Route page')
+  })
+
+  it('keeps the authentication card usable at mobile widths', () => {
+    const wrapper = mountLayout()
+    const cardSection = wrapper.get('section.ml-auto')
+
+    expect(cardSection.classes()).toContain('w-full')
+    expect(cardSection.classes()).toContain('max-w-[460px]')
+    expect(wrapper.get('section.hidden').classes()).toContain('lg:block')
   })
 })
