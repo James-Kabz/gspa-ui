@@ -1,6 +1,6 @@
 {
   "name": "@gspa/ui",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Global Security Practitioners Alliance Vue component library",
