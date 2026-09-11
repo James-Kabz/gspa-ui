@@ -898,8 +898,12 @@ A date picker component with calendar dropdown.
 | `required` | `Boolean` | `false` | Whether required |
 | `min` | `String \| Date` | - | Minimum selectable date |
 | `max` | `String \| Date` | - | Maximum selectable date |
+| `minDate` | `String \| Date` | - | Minimum selectable date (takes precedence over `min`) |
+| `maxDate` | `String \| Date` | - | Maximum selectable date (takes precedence over `max`) |
+| `yearRange` | `readonly [number, number]` | - | Inclusive years shown and selectable |
+| `initialView` | `'day' \| 'month' \| 'year'` | `'day'` | View displayed whenever the calendar opens |
 | `placeholder` | `String` | `'Select date'` | Placeholder text |
-| `format` | `String` | `'MM/DD/YYYY'` | Date format |
+| `format` | `String` | `'DD/MM/YYYY'` | Date format |
 | `clearable` | `Boolean` | `true` | Show clear button |
 | `showToday` | `Boolean` | `true` | Show today button in calendar |
 | `calendarPosition` | `String` | `'left-0 bottom-full'` | Calendar dropdown position |
@@ -932,6 +936,18 @@ const selectedDate = ref('')
 const minDate = '2023-01-01'
 const maxDate = '2023-12-31'
 </script>
+```
+
+For a date-of-birth field that emits an API-ready `YYYY-MM-DD` value:
+
+```vue
+<DatePicker
+  v-model="dateOfBirth"
+  initial-view="year"
+  :year-range="[1900, currentYear]"
+  :max-date="yesterday"
+  format="YYYY-MM-DD"
+/>
 ```
 
 ## ReusableForm (v2)

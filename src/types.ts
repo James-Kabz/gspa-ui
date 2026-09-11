@@ -9,6 +9,9 @@ export type InputType = 'text' | 'email' | 'password' | 'number' | 'tel' | 'url'
 export type InputVariant = 'default' | 'error' | 'success'
 export type FormFieldType = InputType
 export type AlertVariant = 'info' | 'success' | 'warning' | 'error' | 'default' | 'danger'
+export type DatePickerDate = string | Date
+export type DatePickerView = 'day' | 'month' | 'year'
+export type DatePickerYearRange = readonly [startYear: number, endYear: number]
 
 export type AuthNamedItem = string | { name: string; [key: string]: unknown }
 export type AuthCollection = AuthNamedItem[] | (() => AuthNamedItem[])

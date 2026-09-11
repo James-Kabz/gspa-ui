@@ -4,6 +4,9 @@ import VueUI, {
   type ButtonSize,
   type ButtonType,
   type ButtonVariant,
+  type DatePickerDate,
+  type DatePickerView,
+  type DatePickerYearRange,
   type InputType,
   type VueUIPluginOptions
 } from '../index.js'
@@ -23,7 +26,10 @@ const variant: ButtonVariant = 'primaryOutline'
 const size: ButtonSize = 'icon-lg'
 const buttonType: ButtonType = 'submit'
 const inputType: InputType = 'email'
-void [variant, size, buttonType, inputType]
+const datePickerDate: DatePickerDate = '1990-06-15'
+const datePickerView: DatePickerView = 'year'
+const datePickerYearRange: DatePickerYearRange = [1900, new Date().getFullYear()]
+void [variant, size, buttonType, inputType, datePickerDate, datePickerView, datePickerYearRange]
 
 // @ts-expect-error Invalid variants must be rejected by consumers.
 const invalidVariant: ButtonVariant = 'brand-new-variant'
