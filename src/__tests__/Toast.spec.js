@@ -26,7 +26,8 @@ describe('Toast', () => {
     const wrapper = mountToast()
 
     toast.success('Profile saved.', {
-      title: 'Request successful (200)',
+      title: 'Profile updated',
+      statusCode: 200,
       duration: 0
     })
     await wrapper.vm.$nextTick()
@@ -34,9 +35,10 @@ describe('Toast', () => {
     const notification = document.querySelector('.kv-toast')
     expect(notification).not.toBeNull()
     expect(notification.classList).toContain('kv-toast--success')
-    expect(notification.textContent).toContain('Request successful (200)')
+    expect(notification.textContent).toContain('Profile updated')
     expect(notification.textContent).toContain('Profile saved.')
     expect(notification.querySelector('[data-toast-icon="success"]')).not.toBeNull()
+    expect(notification.querySelector('[aria-label="HTTP status 200"]')?.textContent).toContain('200')
   })
 
   it('uses assertive announcements and the error icon for failures', async () => {

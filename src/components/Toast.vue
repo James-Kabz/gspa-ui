@@ -157,12 +157,24 @@ const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toa
           </span>
 
           <div class="kv-toast__content">
-            <p
-              v-if="toastItem.title"
-              class="kv-toast__title"
+            <div
+              v-if="toastItem.title || toastItem.statusCode"
+              class="kv-toast__heading"
             >
-              {{ toastItem.title }}
-            </p>
+              <p
+                v-if="toastItem.title"
+                class="kv-toast__title"
+              >
+                {{ toastItem.title }}
+              </p>
+              <span
+                v-if="toastItem.statusCode"
+                class="kv-toast__status"
+                :aria-label="`HTTP status ${toastItem.statusCode}`"
+              >
+                {{ toastItem.statusCode }}
+              </span>
+            </div>
             <p
               v-if="toastItem.message || toastItem.description"
               class="kv-toast__message"
@@ -197,17 +209,6 @@ const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toa
           >
             <CloseIcon />
           </button>
-
-          <span
-            v-if="toastItem.duration && toastItem.duration > 0"
-            class="kv-toast__progress-track"
-            aria-hidden="true"
-          >
-            <span
-              class="kv-toast__progress"
-              :style="{ animationDuration: `${toastItem.duration}ms` }"
-            />
-          </span>
         </article>
       </TransitionGroup>
     </section>
@@ -302,6 +303,13 @@ const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toa
 
 .kv-toast__content { min-width: 0; padding: 1px 0; }
 
+.kv-toast__heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
 .kv-toast__title,
 .kv-toast__message {
   padding: 0;
@@ -310,12 +318,28 @@ const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toa
 }
 
 .kv-toast__title {
+  min-width: 0;
   overflow-wrap: anywhere;
   color: var(--ui-text, #172033);
   font-size: 0.875rem;
   font-weight: 650;
   line-height: 1.35;
   letter-spacing: -0.006em;
+}
+
+.kv-toast__status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 18px;
+  padding: 1px 5px;
+  color: var(--toast-accent);
+  font-size: 0.625rem;
+  font-weight: 750;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  background: var(--toast-soft);
+  border-radius: 5px;
 }
 
 .kv-toast__message {
@@ -379,26 +403,6 @@ const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toa
 
 .kv-toast__close :deep(svg) { width: 16px; height: 16px; }
 
-.kv-toast__progress-track {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 2px;
-  overflow: hidden;
-  background: transparent;
-}
-
-.kv-toast__progress {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: var(--toast-accent);
-  transform-origin: left;
-  animation: kv-toast-progress linear forwards;
-  opacity: 0.8;
-}
-
 .kv-toast-enter-active,
 .kv-toast-leave-active,
 .kv-toast-move {
@@ -409,11 +413,6 @@ const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toa
 .kv-toast-leave-to {
   opacity: 0;
   transform: translateY(-8px) scale(0.98);
-}
-
-@keyframes kv-toast-progress {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
 }
 
 @keyframes kv-toast-spin {
