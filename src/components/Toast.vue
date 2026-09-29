@@ -1,7 +1,5 @@
 <script setup>
-import { computed } from 'vue'
-import { cva } from 'class-variance-authority'
-import { cn } from '../utils/cn.js'
+import { computed, h } from 'vue'
 import { useToaster } from '../lib/toast.js'
 import Icon from './Icon.vue'
 
@@ -37,267 +35,405 @@ const props = defineProps({
 })
 
 const { toasts, dismiss } = useToaster()
+const visibleToastsList = computed(() => toasts.value.slice(0, props.visibleToasts))
 
-// Limit visible toasts
-const visibleToastsList = computed(() => 
-  toasts.value.slice(0, props.visibleToasts)
-)
-
-// Position classes
-const positionClasses = {
-  'top-left': 'top-0 left-0 flex-col items-start',
-  'top-center': 'top-0 left-1/2 -translate-x-1/2 flex-col items-center',
-  'top-right': 'top-0 right-0 flex-col items-end',
-  'bottom-left': 'bottom-0 left-0 flex-col-reverse items-start',
-  'bottom-center': 'bottom-0 left-1/2 -translate-x-1/2 flex-col-reverse items-center',
-  'bottom-right': 'bottom-0 right-0 flex-col-reverse items-end'
-}
-
-const containerClasses = computed(() =>
-  cn(positionClasses[props.position])
-)
-
-// Toast styling with refined variants
-const toastVariants = cva(
-  'group pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-xl border p-4 transition-all duration-200 hover:-translate-y-0.5',
-  {
-    variants: {
-      variant: {
-        default: 'ui-surface ui-border-strong ui-text shadow-lg shadow-black/5 dark:shadow-black/30',
-        info: 'border-blue-700 bg-blue-700 ui-text-inverse shadow-lg shadow-blue-900/25',
-        success: 'border-green-700 bg-green-700 ui-text-inverse shadow-lg shadow-green-900/25',
-        warning: 'border-amber-600 bg-amber-600 ui-text-inverse shadow-lg shadow-amber-900/25',
-        error: 'border-red-700 bg-red-700 ui-text-inverse shadow-lg shadow-red-900/25',
-        loading: 'ui-surface ui-border-strong ui-text shadow-lg shadow-black/5 dark:shadow-black/30'
-      }
-    },
-    defaultVariants: { variant: 'default' }
+const createSvgIcon = (name, children) => ({
+  name: `Toast${name}Icon`,
+  render() {
+    return h('svg', {
+      'data-toast-icon': name.toLowerCase(),
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': 1.9,
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      'aria-hidden': 'true'
+    }, children.map(([tag, attributes]) => h(tag, attributes)))
   }
+})
+
+const DefaultIcon = createSvgIcon('default', [
+  ['path', { d: 'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9' }],
+  ['path', { d: 'M10 21h4' }]
+])
+const InfoIcon = createSvgIcon('info', [
+  ['circle', { cx: '12', cy: '12', r: '9' }],
+  ['path', { d: 'M12 11v5' }],
+  ['path', { d: 'M12 8h.01' }]
+])
+const SuccessIcon = createSvgIcon('success', [
+  ['circle', { cx: '12', cy: '12', r: '9' }],
+  ['path', { d: 'm8.5 12 2.3 2.3 4.9-5' }]
+])
+const WarningIcon = createSvgIcon('warning', [
+  ['path', { d: 'M10.3 4.1 2.7 17.2A1.8 1.8 0 0 0 4.3 20h15.4a1.8 1.8 0 0 0 1.6-2.8L13.7 4.1a2 2 0 0 0-3.4 0Z' }],
+  ['path', { d: 'M12 9v4' }],
+  ['path', { d: 'M12 16.5h.01' }]
+])
+const ErrorIcon = createSvgIcon('error', [
+  ['circle', { cx: '12', cy: '12', r: '9' }],
+  ['path', { d: 'm9 9 6 6' }],
+  ['path', { d: 'm15 9-6 6' }]
+])
+const LoadingIcon = createSvgIcon('loading', [
+  ['path', { d: 'M21 12a9 9 0 1 1-2.64-6.36' }]
+])
+const CloseIcon = createSvgIcon('close', [
+  ['path', { d: 'm7.5 7.5 9 9' }],
+  ['path', { d: 'm16.5 7.5-9 9' }]
+])
+const ArrowIcon = createSvgIcon('arrow', [
+  ['path', { d: 'M5 12h14' }],
+  ['path', { d: 'm14 7 5 5-5 5' }]
+])
+
+const builtInIcons = {
+  default: DefaultIcon,
+  info: InfoIcon,
+  success: SuccessIcon,
+  warning: WarningIcon,
+  error: ErrorIcon,
+  loading: LoadingIcon
+}
+
+const variant = (toastItem) => builtInIcons[toastItem.variant] ? toastItem.variant : 'default'
+const builtInIcon = (toastItem) => builtInIcons[variant(toastItem)]
+const hasNamedIcon = (toastItem) => typeof toastItem.icon === 'string'
+const customIcon = (toastItem) => {
+  if (toastItem.icon && typeof toastItem.icon !== 'string' && toastItem.icon !== true) {
+    return toastItem.icon
+  }
+  return builtInIcon(toastItem)
+}
+const showIcon = (toastItem) => toastItem.icon !== false
+const isDismissible = (toastItem) => toastItem.dismissible !== false && (
+  toastItem.closeButton || props.closeButton || toastItem.dismissible
 )
-
-const toastClasses = (toast) => cn(toastVariants({ variant: toast.variant }))
-
-// Icon mapping
-const iconMap = {
-  default: 'bell',
-  info: 'info',
-  success: 'check-circle',
-  warning: 'triangle-exclamation',
-  error: 'circle-xmark',
-  loading: 'loader-circle'
-}
-
-// Icon color classes with refined palette
-const iconColorMap = {
-  default: 'ui-primary',
-  info: 'text-white',
-  success: 'text-white',
-  warning: 'text-white',
-  error: 'text-white',
-  loading: 'ui-primary'
-}
-
-// Icon background classes for better visual hierarchy
-const iconBackgroundMap = {
-  default: 'ui-surface-muted border ui-border',
-  info: 'bg-white/15 ring-1 ring-white/25',
-  success: 'bg-white/15 ring-1 ring-white/25',
-  warning: 'bg-white/15 ring-1 ring-white/25',
-  error: 'bg-white/15 ring-1 ring-white/25',
-  loading: 'ui-surface-muted border ui-border'
-}
-
-// Progress bar colors
-const progressBarMap = {
-  default: 'bg-(--ui-primary)',
-  info: 'bg-white/70',
-  success: 'bg-white/70',
-  warning: 'bg-white/70',
-  error: 'bg-white/70',
-  loading: 'bg-(--ui-primary)'
-}
-
-// Action button colors
-const actionButtonMap = {
-  default: 'ui-primary hover:text-(--ui-primary-strong) underline-offset-4 hover:underline',
-  info: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
-  success: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
-  warning: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
-  error: 'text-white/90 hover:text-white underline-offset-4 hover:underline',
-  loading: 'ui-primary hover:text-(--ui-primary-strong) underline-offset-4 hover:underline'
-}
-
-const titleTextMap = {
-  default: 'ui-text',
-  info: 'text-white',
-  success: 'text-white',
-  warning: 'text-white',
-  error: 'text-white',
-  loading: 'ui-text'
-}
-
-const messageTextMap = {
-  default: 'ui-text-muted',
-  info: 'text-white/90',
-  success: 'text-white/90',
-  warning: 'text-white/90',
-  error: 'text-white/90',
-  loading: 'ui-text-muted'
-}
-
-const closeButtonMap = {
-  default: 'ui-text-soft hover:bg-black/5 dark:hover:bg-white/10 hover:text-(--ui-text)',
-  info: 'text-white/80 hover:text-white hover:bg-white/15',
-  success: 'text-white/80 hover:text-white hover:bg-white/15',
-  warning: 'text-white/80 hover:text-white hover:bg-white/15',
-  error: 'text-white/80 hover:text-white hover:bg-white/15',
-  loading: 'ui-text hover:bg-black/5 dark:hover:bg-white/5 hover:text-(--ui-text)'
-}
-
-const getIconName = (toast) => toast.icon || iconMap[toast.variant] || iconMap.default
-const getIconClasses = (toast) => {
-  const baseClasses = iconColorMap[toast.variant] || iconColorMap.default
-  return toast.variant === 'loading' ? `${baseClasses} animate-spin` : baseClasses
-}
-const getIconBackgroundClasses = (toast) => iconBackgroundMap[toast.variant] || iconBackgroundMap.default
-const getProgressBarClasses = (toast) => progressBarMap[toast.variant] || progressBarMap.default
-const getActionButtonClasses = (toast) => actionButtonMap[toast.variant] || actionButtonMap.default
-const getTitleTextClasses = (toast) => titleTextMap[toast.variant] || titleTextMap.default
-const getMessageTextClasses = (toast) => messageTextMap[toast.variant] || messageTextMap.default
-const getCloseButtonClasses = (toast) => closeButtonMap[toast.variant] || closeButtonMap.default
-
-const showIcon = (toast) => toast.icon !== false
-const isDismissible = (toast) => toast.dismissible !== false && (toast.closeButton || props.closeButton || toast.dismissible)
+const positionClass = computed(() => `kv-toast-region--${props.position}`)
+const stackClass = computed(() => props.position.startsWith('bottom-') ? 'kv-toast-stack--bottom' : '')
 </script>
 
 <template>
   <Teleport to="body">
-    <div
-      :class="cn(
-        containerClasses,
-        'fixed z-[10000] flex max-h-screen w-full p-4 md:max-w-[420px] pointer-events-none'
-      )"
+    <section
+      class="kv-toast-region"
+      :class="positionClass"
+      aria-label="Notifications"
+      :data-expanded="props.expand"
+      :data-hotkey="props.hotkey.join('+')"
     >
       <TransitionGroup
-        enter-active-class="transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]"
-        enter-from-class="transform translate-x-full opacity-0 scale-90"
-        enter-to-class="transform translate-x-0 opacity-100 scale-100"
-        leave-active-class="transition-all duration-300 ease-[cubic-bezier(0.4,0,1,1)]"
-        leave-from-class="transform translate-x-0 opacity-100 scale-100"
-        leave-to-class="transform translate-x-full opacity-0 scale-90"
-        move-class="transition-all duration-300 ease-out"
+        name="kv-toast"
         tag="div"
-        class="w-full space-y-3"
+        class="kv-toast-stack"
+        :class="stackClass"
       >
-        <div
-          v-for="toast in visibleToastsList"
-          :key="toast.id"
-          :class="toastClasses(toast)"
+        <article
+          v-for="toastItem in visibleToastsList"
+          :key="toastItem.id"
+          class="kv-toast"
+          :class="[
+            `kv-toast--${variant(toastItem)}`,
+            { 'kv-toast--subtle': !props.richColors }
+          ]"
           role="alert"
-          :aria-live="toast.variant === 'error' ? 'assertive' : 'polite'"
+          :aria-live="toastItem.variant === 'error' ? 'assertive' : 'polite'"
+          aria-atomic="true"
         >
-          <!-- Icon with animated background glow -->
-          <div
-            v-if="showIcon(toast)"
-            :class="cn(
-              'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all duration-300',
-              getIconBackgroundClasses(toast)
-            )"
+          <span
+            v-if="showIcon(toastItem)"
+            class="kv-toast__icon"
           >
             <Icon
-              :icon="getIconName(toast)"
-              :class="cn(
-                'h-5 w-5 transition-transform duration-300 group-hover:scale-110',
-                getIconClasses(toast)
-              )"
+              v-if="hasNamedIcon(toastItem)"
+              :icon="toastItem.icon"
+              aria-hidden="true"
             />
-          </div>
-
-          <!-- Content -->
-          <div class="flex-1 min-w-0 pt-0.5">
-            <div
-              v-if="toast.title"
-              :class="cn('text-md font-semibold leading-tight mb-1', getTitleTextClasses(toast))"
-            >
-              {{ toast.title }}
-            </div>
-            <div
-              v-if="toast.message || toast.description"
-              :class="cn('text-md leading-relaxed', getMessageTextClasses(toast))"
-            >
-              {{ toast.message || toast.description }}
-            </div>
-
-            <!-- Custom component slot -->
             <component
-              :is="toast.component"
-              v-if="toast.component"
-              v-bind="toast.componentProps"
-              class="mt-3"
+              :is="customIcon(toastItem)"
+              v-else
+            />
+          </span>
+
+          <div class="kv-toast__content">
+            <p
+              v-if="toastItem.title"
+              class="kv-toast__title"
+            >
+              {{ toastItem.title }}
+            </p>
+            <p
+              v-if="toastItem.message || toastItem.description"
+              class="kv-toast__message"
+            >
+              {{ toastItem.message || toastItem.description }}
+            </p>
+
+            <component
+              :is="toastItem.component"
+              v-if="toastItem.component"
+              v-bind="toastItem.componentProps"
+              class="kv-toast__custom-content"
             />
 
-            <!-- Action Button -->
             <button
-              v-if="toast.action"
-              class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-              :class="getActionButtonClasses(toast)"
-              @click="toast.action.onClick"
+              v-if="toastItem.action"
+              type="button"
+              class="kv-toast__action"
+              @click="toastItem.action.onClick"
             >
-              {{ toast.action.label }}
-              <Icon
-                icon="arrow-right"
-                class="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5"
-              />
+              {{ toastItem.action.label }}
+              <ArrowIcon />
             </button>
           </div>
 
-          <!-- Close Button -->
           <button
-            v-if="isDismissible(toast)"
-            :class="cn(
-              'absolute right-2 top-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-md opacity-70 transition-all hover:opacity-100 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-(--ui-ring)',
-              getCloseButtonClasses(toast)
-            )"
-            aria-label="Dismiss"
-            @click="dismiss(toast.id)"
+            v-if="isDismissible(toastItem)"
+            type="button"
+            class="kv-toast__close"
+            aria-label="Dismiss notification"
+            @click="dismiss(toastItem.id)"
           >
-            <Icon
-              icon="x"
-              class="h-4 w-4"
-            />
+            <CloseIcon />
           </button>
 
-          <!-- Progress bar for auto-dismiss -->
-          <div
-            v-if="toast.duration && toast.duration > 0"
-            class="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden"
+          <span
+            v-if="toastItem.duration && toastItem.duration > 0"
+            class="kv-toast__progress-track"
+            aria-hidden="true"
           >
-            <div
-              :class="cn(
-                'h-full origin-left animate-toast-progress',
-                getProgressBarClasses(toast)
-              )"
-              :style="{ animationDuration: `${toast.duration}ms` }"
+            <span
+              class="kv-toast__progress"
+              :style="{ animationDuration: `${toastItem.duration}ms` }"
             />
-          </div>
-        </div>
+          </span>
+        </article>
       </TransitionGroup>
-    </div>
+    </section>
   </Teleport>
 </template>
 
-
 <style scoped>
-@keyframes toast-progress {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
+.kv-toast-region {
+  position: fixed;
+  z-index: 10000;
+  width: min(408px, 100vw);
+  max-height: 100dvh;
+  padding: 16px;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
-.animate-toast-progress {
-  animation: toast-progress linear forwards;
+.kv-toast-region--top-left { top: 0; left: 0; }
+.kv-toast-region--top-center { top: 0; left: 50%; transform: translateX(-50%); }
+.kv-toast-region--top-right { top: 0; right: 0; }
+.kv-toast-region--bottom-left { bottom: 0; left: 0; }
+.kv-toast-region--bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); }
+.kv-toast-region--bottom-right { right: 0; bottom: 0; }
+
+.kv-toast-stack {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kv-toast-stack--bottom { flex-direction: column-reverse; }
+
+.kv-toast {
+  --toast-accent: var(--ui-primary, #173866);
+  --toast-soft: var(--ui-primary-soft, #e6edf7);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 28px;
+  align-items: start;
+  gap: 10px;
+  width: 100%;
+  min-height: 58px;
+  padding: 12px 10px 13px 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: var(--ui-text, #172033);
+  background: var(--ui-surface, #ffffff);
+  border: 1px solid var(--ui-border, #dce3ed);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgb(15 23 42 / 14%), 0 2px 8px rgb(15 23 42 / 7%);
+  pointer-events: auto;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.kv-toast::before {
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 3px;
+  background: var(--toast-accent);
+  border-radius: 0 3px 3px 0;
+  content: '';
+}
+
+.kv-toast:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 38px rgb(15 23 42 / 17%), 0 3px 10px rgb(15 23 42 / 8%);
+}
+
+.kv-toast--info { --toast-accent: var(--ui-cyber, #176b87); --toast-soft: var(--ui-cyber-soft, #e0f2f7); }
+.kv-toast--success { --toast-accent: var(--ui-success, #14745d); --toast-soft: var(--ui-success-soft, #def3eb); }
+.kv-toast--warning { --toast-accent: var(--ui-warning, #a96008); --toast-soft: var(--ui-warning-soft, #fff0d6); }
+.kv-toast--error { --toast-accent: var(--ui-danger, #b4233c); --toast-soft: var(--ui-danger-soft, #fde7eb); }
+.kv-toast--subtle::before { opacity: 0.65; }
+
+.kv-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--toast-accent);
+  background: var(--toast-soft);
+  border-radius: 10px;
+}
+
+.kv-toast__icon :deep(svg) { display: block; width: 19px; height: 19px; }
+.kv-toast--loading .kv-toast__icon :deep(svg) { animation: kv-toast-spin 900ms linear infinite; }
+
+.kv-toast__content { min-width: 0; padding: 1px 0; }
+
+.kv-toast__title,
+.kv-toast__message {
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+}
+
+.kv-toast__title {
+  overflow-wrap: anywhere;
+  color: var(--ui-text, #172033);
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.006em;
+}
+
+.kv-toast__message {
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+  color: var(--ui-text-muted, #5b687a);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.kv-toast__custom-content { margin-top: 9px; }
+
+.kv-toast__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 3px 7px;
+  margin: 9px 0 0 -7px;
+  color: var(--toast-accent);
+  font: inherit;
+  font-size: 0.775rem;
+  font-weight: 650;
+  line-height: 1;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.kv-toast__action:hover { background: var(--toast-soft); }
+.kv-toast__action :deep(svg) { width: 13px; height: 13px; transition: transform 150ms ease; }
+.kv-toast__action:hover :deep(svg) { transform: translateX(2px); }
+
+.kv-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--ui-text-soft, #78869a);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.kv-toast__close:hover {
+  color: var(--ui-text, #172033);
+  background: var(--ui-surface-muted, #f0f3f8);
+}
+
+.kv-toast__close:focus-visible,
+.kv-toast__action:focus-visible {
+  outline: 2px solid var(--ui-ring, var(--ui-primary, #173866));
+  outline-offset: 2px;
+}
+
+.kv-toast__close :deep(svg) { width: 16px; height: 16px; }
+
+.kv-toast__progress-track {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.kv-toast__progress {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--toast-accent);
+  transform-origin: left;
+  animation: kv-toast-progress linear forwards;
+  opacity: 0.8;
+}
+
+.kv-toast-enter-active,
+.kv-toast-leave-active,
+.kv-toast-move {
+  transition: opacity 220ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kv-toast-enter-from,
+.kv-toast-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+}
+
+@keyframes kv-toast-progress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+@keyframes kv-toast-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+  .kv-toast-region { width: 100vw; padding: 10px; }
+  .kv-toast { border-radius: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kv-toast,
+  .kv-toast-enter-active,
+  .kv-toast-leave-active,
+  .kv-toast-move,
+  .kv-toast__action :deep(svg) {
+    transition-duration: 0.01ms;
+  }
+
+  .kv-toast--loading .kv-toast__icon :deep(svg) { animation-duration: 1.8s; }
 }
 </style>
